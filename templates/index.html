@@ -1,17 +1,18 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-     <title>GenAI Financial Assistant</title>
+    <title>Financial Assistant</title>
 </head>
 <body>
-    <h2>Ask your Financial Question</h2>
-    <form method="post" action="/ask-ui">
-        <input type="text" name="query" placeholder="Enter your question" style="width:300px;">
-        <button type="Submit">Ask</button>
+    <h1>Ask your Financial Assistant</h1>
+    <form method="POST">
+        <label for="query">Enter your question:</label>
+        <input type="text" name="query" required>
+        <button type="submit">Ask</button>
     </form>
+
     {% if answer %}
-        <h3>Answer;</h3>
+        <h2>Answer:</h2>
         <p>{{ answer }}</p>
     {% endif %}
 </body>
