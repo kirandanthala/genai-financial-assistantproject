@@ -1,5 +1,5 @@
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,render_template
 from openai import AzureOpenAI
 import pandas as pd
 import os
@@ -45,10 +45,10 @@ def ask():
     except FileNotFoundError:
         return jsonify({"error": "transactions.csv file not found"}), 500
 
-    # Default context
+   
     context = "Transaction data available."
 
-    # Simple logic for different queries
+    
     if "groceries" in user_query.lower():
         groceries_spent = df[df["category"] == "groceries"]["amount"].sum()
         context = f"You spent {groceries_spent} INR on groceries last month."
@@ -75,6 +75,45 @@ def ask():
         return jsonify({"answer": ai_response})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+@app.route("/ask-ui", methods=["GET", "POST"])
+def ask_ui():
+    answer = None
+    if request.method == "POST":
+        user_query = request.form.get("query")
+
+        try:
+            df = pd.read_csv("transactions.csv")
+        except FileNotFoundError:
+            answer = "Error: transactions.csv file not found"
+            return render_template("index.html", answer=answer)
+
+        # Default context
+        context = "Transaction data available."
+        if "groceries" in user_query.lower():
+            context = f"You spent {df[df['category']=='groceries']['amount'].sum()} INR on groceries last month."
+        elif "travel" in user_query.lower():
+            context = f"You spent {df[df['category']=='travel']['amount'].sum()} INR on travel last month."
+        elif "rent" in user_query.lower():
+            context = f"Your rent payment last month was {df[df['category']=='rent']['amount'].sum()} INR."
+        else:
+            context = f"Your total spending last month was {df['amount'].sum()} INR."
+
+        try:
+            completion = client.chat.completions.create(
+                model="Financemodel-genai",
+                messages=[
+                    {"role": "system", "content": "You are a financial assistant."},
+                    {"role": "user", "content": f"{user_query}. Context: {context}"}
+                ]
+            )
+            answer = completion.choices[0].message.content
+        except Exception as e:
+            answer = f"Error: {str(e)}"
+
+    return render_template("index.html", answer=answer)
+                                            
+        
+
 
 
 # --------------------------
