@@ -29,7 +29,7 @@ def home():
     return render_template("index.html")
 
 
-@app.route("/ask-ui", methods=["POST"])
+@app.route("/ask-ui", methods=["GET", "POST"])
 def ask_ui():
     user_query = request.form.get("query", "")
     answer = None
