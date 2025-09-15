@@ -1,5 +1,4 @@
-
-from flask import Flask, request, jsonify,render_template
+from flask import Flask, request, render_template, jsonify
 from openai import AzureOpenAI
 import pandas as pd
 import os
@@ -14,7 +13,6 @@ AZURE_ENDPOINT = "https://fiancemngmnt.openai.azure.com/"
 AZURE_API_VERSION = "2024-05-01-preview"
 DEPLOYMENT_NAME = "Financemodel-genai" 
 
-
 client = AzureOpenAI(
     api_key=AZURE_API_KEY,
     api_version=AZURE_API_VERSION,
@@ -25,32 +23,28 @@ client = AzureOpenAI(
 # Routes
 # --------------------------
 
-#@app.route("/")
-#def home():
-#    return " Azure OpenAI Financial Assistant is running!"
-    
-
-
 @app.route("/")
 def home():
-    # Redirect root ("/") to the UI
-    return redirect(url_for("ask_ui"))
+    # Load the UI directly
+    return render_template("index.html")
 
-@app.route("/ask", methods=["POST"])
-def ask():
-    data = request.get_json()
-    user_query = data.get("query", "")
+
+@app.route("/ask-ui", methods=["POST"])
+def ask_ui():
+    user_query = request.form.get("query", "")
+    answer = None
 
     if not user_query:
-        return jsonify({"error": "No query provided"}), 400
+        return render_template("index.html", answer="Please enter a question.")
 
+    # Load transaction data
     try:
         df = pd.read_csv("transactions.csv")
     except FileNotFoundError:
-        return jsonify({"error": "transactions.csv file not found"}), 500
+        return render_template("index.html", answer="Error: transactions.csv file not found")
 
+    # Context logic
     context = "Transaction data available."
-
     if "groceries" in user_query.lower():
         groceries_spent = df[df["category"] == "groceries"]["amount"].sum()
         context = f"You spent {groceries_spent} INR on groceries last month."
@@ -64,33 +58,18 @@ def ask():
         total_spent = df["amount"].sum()
         context = f"Your total spending last month was {total_spent} INR."
 
+    # Call Azure OpenAI
     try:
         completion = client.chat.completions.create(
-            model=DEPLOYMENT_NAME,
+            model="Financemodel-genai",
             messages=[
                 {"role": "system", "content": "You are a financial assistant. Answer based on transaction context."},
-                {"role": "user", "content": f"{user_query}. Context: {context}"}
+                {"role": "user", "content": f"{user_query}. Here is some context: {context}"}
             ]
         )
-        ai_response = completion.choices[0].message.content
-        return jsonify({"answer": ai_response})
+        answer = completion.choices[0].message.content
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-#  Web UI route
-@app.route("/ask-ui", methods=["GET", "POST"])
-def ask_ui():
-    answer = None
-    if request.method == "POST":
-        user_query = request.form["query"]
-
-        
-        response = ask()
-        if isinstance(response, tuple):  # error case
-            return render_template("index.html", answer=f"Error: {response[0].get_json()['error']}")
-        else:
-            answer = response.get_json().get("answer")
+        answer = f"Error calling Azure OpenAI: {str(e)}"
 
     return render_template("index.html", answer=answer)
 
