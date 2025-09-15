@@ -47,18 +47,19 @@ def ask_ui():
     context = "Transaction data available."
     matched=False
 
-     # 🔹 Dynamic check for categories
+     # Dynamic check for categories
     categories = df["category"].unique()
-        for cat in categories:
-            if cat.lower() in user_query.lower():
-                spent = df[df["category"].str.lower() == cat.lower()]["amount"].sum()
-                context = f"You spent {spent} INR on {cat} last month."
-                matched = True
-                break
-
-        if not matched:
-            total_spent = df["amount"].sum()
-            context = f"Your total spending last month was {total_spent} INR."   
+    for cat in categories:
+        if cat.lower() in user_query.lower():
+            spent = df[df["category"].str.lower() == cat.lower()]["amount"].sum()
+            context = f"You spent {spent} INR on {cat} last month."
+            matched = True
+            break
+                
+    if not matched:
+        total_spent = df["amount"].sum()
+        context = f"Your total spending last month was {total_spent} INR." 
+              
 
     # if "groceries" in user_query.lower():
     #     groceries_spent = df[df["category"] == "groceries"]["amount"].sum()
