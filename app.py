@@ -45,18 +45,33 @@ def ask_ui():
 
     # Context logic
     context = "Transaction data available."
-    if "groceries" in user_query.lower():
-        groceries_spent = df[df["category"] == "groceries"]["amount"].sum()
-        context = f"You spent {groceries_spent} INR on groceries last month."
-    elif "travel" in user_query.lower():
-        travel_spent = df[df["category"] == "travel"]["amount"].sum()
-        context = f"You spent {travel_spent} INR on travel last month."
-    elif "rent" in user_query.lower():
-        rent_spent = df[df["category"] == "rent"]["amount"].sum()
-        context = f"Your rent payment last month was {rent_spent} INR."
-    else:
-        total_spent = df["amount"].sum()
-        context = f"Your total spending last month was {total_spent} INR."
+    matched=False
+
+     # 🔹 Dynamic check for categories
+    categories = df["category"].unique()
+        for cat in categories:
+            if cat.lower() in user_query.lower():
+                spent = df[df["category"].str.lower() == cat.lower()]["amount"].sum()
+                context = f"You spent {spent} INR on {cat} last month."
+                matched = True
+                break
+
+        if not matched:
+            total_spent = df["amount"].sum()
+            context = f"Your total spending last month was {total_spent} INR."   
+
+    # if "groceries" in user_query.lower():
+    #     groceries_spent = df[df["category"] == "groceries"]["amount"].sum()
+    #     context = f"You spent {groceries_spent} INR on groceries last month."
+    # elif "travel" in user_query.lower():
+    #     travel_spent = df[df["category"] == "travel"]["amount"].sum()
+    #     context = f"You spent {travel_spent} INR on travel last month."
+    # elif "rent" in user_query.lower():
+    #     rent_spent = df[df["category"] == "rent"]["amount"].sum()
+    #     context = f"Your rent payment last month was {rent_spent} INR."
+    # else:
+    #     total_spent = df["amount"].sum()
+    #     context = f"Your total spending last month was {total_spent} INR."
 
     # Call Azure OpenAI
     try:
