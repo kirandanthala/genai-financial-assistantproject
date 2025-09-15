@@ -2,6 +2,7 @@
 from flask import Flask, request, jsonify
 from openai import AzureOpenAI
 import pandas as pd
+import os
 
 app = Flask(__name__)
 
