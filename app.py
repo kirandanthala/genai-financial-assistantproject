@@ -32,9 +32,10 @@ def home():
 
 @app.route("/ask-ui", methods=["GET", "POST"])
 def ask_ui():
-    user_query = request.form.get("query", "")
-    answer = None
+    if request.method == "GET":
+        return render_template("index.html")  # just show form
 
+    user_query = request.form.get("query", "")
     if not user_query:
         return render_template("index.html", answer="Please enter a question.")
 
@@ -46,46 +47,24 @@ def ask_ui():
 
     # Context logic
     context = "Transaction data available."
-    matched=False
-
-     # Dynamic check for categories
-    categories = df["category"].unique()
     user_text = user_query.lower()
     matched = False
 
-    for cat in categories:
+    for cat in df["category"].unique():
         if re.search(rf"\b{cat.lower()}\b", user_text):
             spent = df[df["category"].str.lower() == cat.lower()]["amount"].sum()
             context = f"You spent {spent} INR on {cat} last month."
             matched = True
             break
-        
-    # use regex to check full word match (case insensitive)
-
 
     if not matched:
         total_spent = df["amount"].sum()
         context = f"Your total spending last month was {total_spent} INR."
-    
-              
-
-    # if "groceries" in user_query.lower():
-    #     groceries_spent = df[df["category"] == "groceries"]["amount"].sum()
-    #     context = f"You spent {groceries_spent} INR on groceries last month."
-    # elif "travel" in user_query.lower():
-    #     travel_spent = df[df["category"] == "travel"]["amount"].sum()
-    #     context = f"You spent {travel_spent} INR on travel last month."
-    # elif "rent" in user_query.lower():
-    #     rent_spent = df[df["category"] == "rent"]["amount"].sum()
-    #     context = f"Your rent payment last month was {rent_spent} INR."
-    # else:
-    #     total_spent = df["amount"].sum()
-    #     context = f"Your total spending last month was {total_spent} INR."
 
     # Call Azure OpenAI
     try:
         completion = client.chat.completions.create(
-            model="Financemodel-genai",
+            model=DEPLOYMENT_NAME,
             messages=[
                 {"role": "system", "content": "You are a financial assistant. Answer based on transaction context."},
                 {"role": "user", "content": f"{user_query}. Here is some context: {context}"}
@@ -98,9 +77,12 @@ def ask_ui():
     return render_template("index.html", answer=answer)
 
 
+
 # --------------------------
 # Run the app
 # --------------------------
 if __name__ == "__main__":
-    port=int(os.environ.get("PORT",5000))
-    app.run(host="0.0.0.0",port=port)
+    # Bind to 0.0.0.0 and use Azure's expected port
+    port = int(os.environ.get("PORT", 8000))
+    app.run(host="0.0.0.0", port=port)
+
