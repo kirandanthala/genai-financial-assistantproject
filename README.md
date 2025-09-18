@@ -95,23 +95,23 @@ Open Web UI.
 
 Expected Result: System returns shopping total.
 
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
-TC1.3 – Query medicine spending
+TC1.3 – Query haircut spending
 
-Preconditions: transactions.csv has category = medicine.
+Preconditions: transactions.csv has category = haircut.
 
 Steps:
 
 Open Web UI.
 
-1.Enter: “What about medicine expenses?”
+1.Enter: “What about Haircut expenses?”
 
 2.Submit.
 
 Expected Result: System returns medicine total.
 
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 TC1.4 – (Negative) Unknown category
 
@@ -127,7 +127,7 @@ Open Web UI.
 
 Expected Result: System returns total spending (fallback).
 
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 User Story 2 – Rent Spending
 
@@ -145,7 +145,7 @@ Open Web UI.
 
 Expected Result: System returns rent amount.
 
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 TC2.2 – Rent alternative wording
 
@@ -159,7 +159,7 @@ Steps:
 
 Expected Result: System returns rent amount.
 
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 TC2.3 – Rent case-insensitive
 
@@ -173,7 +173,7 @@ Steps:
 
 Expected Result: System returns rent amount.
 
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 TC2.4 – (Negative) Rent missing
 
@@ -187,7 +187,7 @@ Steps:
 
 Expected Result: System falls back → total spending.
 
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 User Story 3 – Analyst Spending Trends
 
@@ -203,7 +203,7 @@ Steps:
 
 Expected Result: System returns travel amount.
 
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 TC3.2 – Query groceries (trend)
 
@@ -217,7 +217,7 @@ Steps:
 
 Expected Result: System returns groceries total.
 
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 TC3.3 – Query shopping (trend)
 
@@ -231,7 +231,7 @@ Steps:
 
 Expected Result: System returns shopping total.
 
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 TC3.4 – (Negative) Empty CSV
 
@@ -245,7 +245,7 @@ Steps:
 
 Expected Result: System returns error “transactions.csv file not found or empty”.
 
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 User Story 4 – Edge Cases / Developer Testing
 
@@ -398,7 +398,7 @@ flowchart TD
     E --> F[AI Response Generated]
     F --> G[Answer Displayed in Browser]
 
-📖 Learnings and Challenges
+ Learnings and Challenges
 
 Learned how to integrate Flask with Azure OpenAI.
 

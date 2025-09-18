@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, jsonify
 from openai import AzureOpenAI
 import pandas as pd
 import os
+import re
 
 app = Flask(__name__)
 
@@ -49,16 +50,23 @@ def ask_ui():
 
      # Dynamic check for categories
     categories = df["category"].unique()
+    user_text = user_query.lower()
+    matched = False
+
     for cat in categories:
-        if cat.lower() in user_query.lower():
+        if re.search(rf"\b{cat.lower()}\b", user_text):
             spent = df[df["category"].str.lower() == cat.lower()]["amount"].sum()
             context = f"You spent {spent} INR on {cat} last month."
             matched = True
             break
-                
+        
+    # use regex to check full word match (case insensitive)
+
+
     if not matched:
         total_spent = df["amount"].sum()
-        context = f"Your total spending last month was {total_spent} INR." 
+        context = f"Your total spending last month was {total_spent} INR."
+    
               
 
     # if "groceries" in user_query.lower():
