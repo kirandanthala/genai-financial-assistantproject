@@ -32,9 +32,9 @@ def ask_ui():
     if not user_query:
         return render_template("index.html", answer="Please enter a question.")
 
-    # Load transaction data
+    csv_path=os.path.join(os.path.dirname(__file__),'transactions.csv')
     try:
-        df = pd.read_csv("transactions.csv")
+        df = pd.read_csv(csv_path)
     except FileNotFoundError:
         return render_template("index.html", answer="Error: transactions.csv file not found")
 
