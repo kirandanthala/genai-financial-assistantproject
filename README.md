@@ -1,16 +1,15 @@
-# GenAI-Powered Financial Insights Assistant  
+GENAI POWERED FINANCIAL ASSISTANT 
 
-## 🎯 Objective  
+    **OBJECTIVE**  
 A GenAI-powered assistant that provides personalized financial insights based on user queries and transaction data.  
-- Accepts natural language queries (e.g., *“How much did I spend on groceries last month?”*)  
-- Analyzes structured transaction data (`transactions.csv`)  
-- Uses **Azure OpenAI (GPT deployment)** to generate financial summaries  
-- Provides actionable insights (spending trends, saving tips)  
-- Accessible via a simple **web interface** (`/ask-ui`)  
+. Accepts natural language queries (e.g., *“How much did I spend on groceries last month?”*)  
+. Analyzes structured transaction data ('transactions.csv)  
+. Uses  to generate financial summaries  
+. Provides actionable insights (spending trends, saving tips)  
+. Accessible via a simple *web interface* ('/ask-ui')  
 
----
 
-## Project Structure
+   *PROJECT STRUCTURE**
 genai-financial-assistantproject/
 │-- app.py # Flask application
 │-- requirements.txt # Dependencies
@@ -19,349 +18,219 @@ genai-financial-assistantproject/
 └── index.html # Web interface
 │-- README.md # Documentation
 
-yaml
-Copy code
 
----
 
-## ⚙️ Setup Instructions  
+--- SETUP INSTRUCTIONS
 
-### 1. Clone the Repository  
-
-git clone https://github.com/<your-username>/genai-financial-assistantproject.git
+1.Clone the Repository  
+git clone https://github.com/kirandanthala/genai-financial-assistantproject
 cd genai-financial-assistantproject
-2. Create Virtual Environment & Install Requirements
+
+2.Create Virtual Environment & Install Requirements
 python -m venv venv
-venv\Scripts\activate   # Windows
-source venv/bin/activate # Linux/Mac
+venv\Scripts\activate.bat  # Windows
 pip install -r requirements.txt
 
-3. Run Locally
+3.Run Locally
 python app.py
 Open in browser: http://127.0.0.1:5000
 
- Azure Deployment
+*AZURE DEPLOYEMENT*
+
 Deployed using Azure App Service (Linux, Python runtime)
-
 Environment Variables (Configuration → Application Settings):
-
 AZURE_OPENAI_KEY → AZURE_API_KEY
-
 AZURE_ENDPOINT →  https://fiancemngmnt.openai.azure.com/
-
 AZURE_DEPLOYMENT → Financemodel-genai
 
 Public URL:
+https://genaiassistant-e7h3hkf7fagdawa2.canadacentral-01.azurewebsites.net/ask-ui
 
-https://<your-app-name>.azurewebsites.net/
-🌐 Usage
+==>USAGE
 Web Interface: / or /ask-ui
 Accessible in any browser:
 
-https://<your-app-name>.azurewebsites.net/
-Shows a text box to enter queries
+https://genaiassistant-e7h3hkf7fagdawa2.canadacentral-01.azurewebsites.net/ask-ui
 
+Shows a text box to enter queries
 Displays AI response directly below
 
-User Story 1 – Category Spending (e.g., groceries, shopping, medicine)
+**USER STORIES* 
+==>>User Story 1 – Category Spending (e.g., groceries, shopping, medicine)
 
 TC1.1 – Query groceries spending
-
 Preconditions: transactions.csv has category = groceries.
-
 Steps:
-
 Open Web UI.
-
 1.Enter: “How much did I spend on groceries last month?”
-
 2.Submit.
-
 Expected Result: System returns grocery total from CSV.
-
-Actual Result: (to be filled during testing)
+Actual Result: (Filled in table)
 
 TC1.2 – Query shopping spending
-
 Preconditions: transactions.csv has category = shopping.
-
 Steps:
-
 Open Web UI.
-
 1.Enter: “How much on shopping last month?”
-
 2.Submit.
-
 Expected Result: System returns shopping total.
-
 Actual Result: (Filled in Table)
 
 TC1.3 – Query haircut spending
-
 Preconditions: transactions.csv has category = haircut.
-
 Steps:
-
 Open Web UI.
-
 1.Enter: “What about Haircut expenses?”
-
 2.Submit.
-
 Expected Result: System returns medicine total.
-
 Actual Result: (Filled in Table)
 
 TC1.4 – (Negative) Unknown category
-
 Preconditions: transactions.csv does NOT have category = movies.
-
 Steps:
-
 Open Web UI.
-
 1.Enter: “How much did I spend on movies last month?”
-
 2.Submit.
-
 Expected Result: System returns total spending (fallback).
-
 Actual Result: (Filled in Table)
 
-User Story 2 – Rent Spending
+===>>User Story 2 – Rent Spending
 
 TC2.1 – Query rent
-
 Preconditions: transactions.csv has category = rent.
-
 Steps:
-
 Open Web UI.
-
 1.Enter: “What was my rent last month?”
-
 2.Submit.
-
 Expected Result: System returns rent amount.
-
 Actual Result: (Filled in Table)
 
 TC2.2 – Rent alternative wording
-
 Preconditions: Same CSV.
-
 Steps:
-
 1.Enter: “Tell me my house rent last month”.
-
 2.Submit.
-
 Expected Result: System returns rent amount.
-
 Actual Result: (Filled in Table)
 
 TC2.3 – Rent case-insensitive
-
 Preconditions: Same CSV.
-
 Steps:
-
 1.Enter: “rent” (lowercase).
-
 2.Submit.
-
 Expected Result: System returns rent amount.
-
 Actual Result: (Filled in Table)
 
 TC2.4 – (Negative) Rent missing
-
 Preconditions: transactions.csv does NOT have category = rent.
-
 Steps:
-
 1.Enter: “What was my rent last month?”
-
 2.Submit.
-
 Expected Result: System falls back → total spending.
-
 Actual Result: (Filled in Table)
 
-User Story 3 – Analyst Spending Trends
+==>>User Story 3 – Analyst Spending Trends
 
 TC3.1 – Query travel
-
 Preconditions: transactions.csv has category = travel.
-
 Steps:
-
 1.Enter: “How much did I spend on travel last month?”
-
 2.Submit.
-
 Expected Result: System returns travel amount.
-
 Actual Result: (Filled in Table)
 
 TC3.2 – Query groceries (trend)
-
 Preconditions: Same CSV.
-
 Steps:
-
 1.Enter: “Groceries expense last month?”
-
 2.Submit.
-
 Expected Result: System returns groceries total.
-
 Actual Result: (Filled in Table)
 
 TC3.3 – Query shopping (trend)
-
 Preconditions: Same CSV.
-
 Steps:
-
 1.Enter: “Shopping spending last month?”
-
 2.Submit.
-
 Expected Result: System returns shopping total.
 
 Actual Result: (Filled in Table)
 
 TC3.4 – (Negative) Empty CSV
-
 Preconditions: transactions.csv is empty.
-
 Steps:
-
 1.Enter: “How much did I spend on travel last month?”
-
 2.Submit.
-
 Expected Result: System returns error “transactions.csv file not found or empty”.
-
 Actual Result: (Filled in Table)
 
-User Story 4 – Edge Cases / Developer Testing
+==>>User Story 4 – Edge Cases / Developer Testing
 
 TC4.1 – Empty query
-
 Preconditions: Web UI loaded.
-
 Steps:
-
 1.Leave query field blank.
-
 2.Submit.
-
 Expected Result: System shows “Please enter a question.”
-
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 TC4.2 – Invalid query
-
 Preconditions: Same CSV.
-
 Steps:
-
 1.Enter: “asdfghjkl???”
-
 2.Submit.
-
 Expected Result: System falls back → total spending.
-
 Actual Result: (to be filled)
 
 TC4.3 – Query with symbols
-
 Preconditions: CSV has travel.
-
 Steps:
-
 1.Enter: “!!! Travel ???”
-
 2.Submit.
-
 Expected Result: System still detects travel and returns amount.
-
 Actual Result: (to be filled)
 
 TC4.4 – (Negative) Special characters only
-
 Preconditions: Web UI loaded.
-
 Steps:
-
 1.Enter: “@@@###”.
-
 2.Submit.
-
 Expected Result: System falls back → total spending.
-
 Actual Result: (to be filled)
 
-User Story 5 – Total Spending
+==>>User Story 5 – Total Spending
 
 TC5.1 – Query total
-
 Preconditions: transactions.csv has multiple categories.
-
 Steps:
-
 1.Enter: “What is my total spending last month?”
-
 2.Submit.
-
 Expected Result: System returns total spending.
-
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 TC5.2 – Alternative wording
-
 Preconditions: Same CSV.
-
 Steps:
-
 1.Enter: “Show all my expenses last month”
-
 2.Submit.
-
 Expected Result: System returns total spending.
-
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 TC5.3 – Lowercase query
-
 Preconditions: Same CSV.
-
 Steps:
-
 1.Enter: “total spending”
-
 2.Submit.
-
 Expected Result: System returns total spending.
-
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 TC5.4 – (Negative) Malformed query
-
 Preconditions: Same CSV.
-
 Steps:
-
 1.Enter: “Tell me blah blah”
-
 2.Submit.
-
 Expected Result: System falls back → total spending.
-
-Actual Result: (to be filled)
+Actual Result: (Filled in Table)
 
 
 TESTCASES 
@@ -389,8 +258,8 @@ TC5.4	Story 5 – Total (Negative)	Malformed query	Same CSV	Enter “Tell me bla
 
 
 
- Architecture
-flowchart TD
+              **Architecture*
+flowchart 
     A[User Query in Web UI] --> B[Flask App]
     B --> C[Load transactions.csv using pandas]
     C --> D[Dynamic Category Detection]
@@ -398,20 +267,15 @@ flowchart TD
     E --> F[AI Response Generated]
     F --> G[Answer Displayed in Browser]
 
- Learnings and Challenges
+===> LEARNINGS AND CHALLENGES
 
-Learned how to integrate Flask with Azure OpenAI.
+-Learned how to integrate Flask with Azure OpenAI.
+-Understood environment variable handling to protect secrets.
+-Faced issues with deployment (Application Error, 405 Method Not Allowed) and fixed them.
+-Implemented dynamic category detection → now app works with any category in transactions.csv.
+-Learned Agile practices → writing User Stories (3C) and Test Cases (with actual results).
 
-Understood environment variable handling to protect secrets.
-
-Faced issues with deployment (Application Error, 405 Method Not Allowed) and fixed them.
-
-Implemented dynamic category detection → now app works with any category in transactions.csv.
-
-Learned Agile practices → writing User Stories (3C) and Test Cases (with actual results).
-
- Live Demo
 
 Web Interface:
 
-https://<your-app-name>.azurewebsites.net/
+https://genaiassistant-e7h3hkf7fagdawa2.canadacentral-01.azurewebsites.net/ask-ui

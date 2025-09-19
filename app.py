@@ -6,9 +6,7 @@ import re
 
 app = Flask(__name__)
 
-# --------------------------
-# Azure OpenAI Configuration
-# --------------------------
+#AZURE OPENAI CONFIGURATION-------------------------
 AZURE_API_KEY = os.getenv("AZURE_OPENAI_KEY")
 AZURE_ENDPOINT = "https://fiancemngmnt.openai.azure.com/"  
 AZURE_API_VERSION = "2024-05-01-preview"
@@ -20,32 +18,27 @@ client = AzureOpenAI(
     azure_endpoint=AZURE_ENDPOINT
 )
 
-# --------------------------
-# Routes
-# --------------------------
-
 @app.route("/")
 def home():
-    # Load the UI directly
     return render_template("index.html")
 
 
 @app.route("/ask-ui", methods=["GET", "POST"])
 def ask_ui():
     if request.method == "GET":
-        return render_template("index.html")  # just show form
+        return render_template("index.html")  
 
     user_query = request.form.get("query", "")
     if not user_query:
         return render_template("index.html", answer="Please enter a question.")
 
-    # Load transaction data
+    
     try:
         df = pd.read_csv("transactions.csv")
     except FileNotFoundError:
         return render_template("index.html", answer="Error: transactions.csv file not found")
 
-    # Context logic
+    
     context = "Transaction data available."
     user_text = user_query.lower()
     matched = False
@@ -61,7 +54,6 @@ def ask_ui():
         total_spent = df["amount"].sum()
         context = f"Your total spending last month was {total_spent} INR."
 
-    # Call Azure OpenAI
     try:
         completion = client.chat.completions.create(
             model=DEPLOYMENT_NAME,
@@ -78,11 +70,8 @@ def ask_ui():
 
 
 
-# --------------------------
-# Run the app
-# --------------------------
+
 if __name__ == "__main__":
-    # Bind to 0.0.0.0 and use Azure's expected port
     port = int(os.environ.get("PORT", 8000))
     app.run(host="0.0.0.0", port=port)
 
