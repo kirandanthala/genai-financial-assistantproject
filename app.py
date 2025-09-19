@@ -38,7 +38,7 @@ def ask_ui():
     except FileNotFoundError:
         return render_template("index.html", answer="Error: transactions.csv file not found")
 
-    # Clean data: handle missing amounts
+    
     if "amount" in df.columns:
         df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0)
 
@@ -48,31 +48,39 @@ def ask_ui():
 
     if "date" in df.columns:
         df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    
 
-       
-        months = {
-            "january": 1, "february": 2, "march": 3, "april": 4,
-            "may": 5, "june": 6, "july": 7, "august": 8,
-            "september": 9, "october": 10, "november": 11, "december": 12
-        }
-        month_num = None
-        for m, num in months.items():
-            if m in user_text:
-                month_num = num
-                break
-        year_match = re.search(r"\b(20\d{2})\b", user_text)
-        year = int(year_match.group(1)) if year_match else None
-        if month_num or year:
-            filtered = df.copy()
-            if month_num:
-                filtered = filtered[filtered["date"].dt.month == month_num]
-            if year:
-                filtered = filtered[filtered["date"].dt.year == year]
+    months = {
+        "january": 1, "february": 2, "march": 3, "april": 4,
+        "may": 5, "june": 6, "july": 7, "august": 8,
+        "september": 9, "october": 10, "november": 11, "december": 12
+    }
 
-            if filtered.empty:
-                context = f"No spending records found for {month_num if month_num else ''} {year if year else ''}."
-            else:
-                df = filtered  
+    month_num = None
+    for m, num in months.items():
+        if m in user_text:
+            month_num = num
+            break
+
+    year_match = re.search(r"\b(20\d{2})\b", user_text)
+    year = int(year_match.group(1)) if year_match else None
+
+    if month_num or year:
+        valid_dates = df.dropna(subset=["date"])
+        filtered = valid_dates.copy()
+
+        if month_num:
+            filtered = filtered[filtered["date"].dt.month == month_num]
+        if year:
+            filtered = filtered[filtered["date"].dt.year == year]
+
+        if filtered.empty:
+            context = f"No spending records found for {month_num if month_num else ''} {year if year else ''}."
+            df = filtered  
+        else:
+            df = filtered
+            if len(df) < len(valid_dates):
+                context += " (Note: Some records were skipped because the date was missing)"
 
     
     for cat in df["category"].dropna().unique():
