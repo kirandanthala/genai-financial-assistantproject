@@ -6,7 +6,7 @@ import re
 
 app = Flask(__name__)
 
-#AZURE OPENAI CONFIGURATION-------------------------
+
 AZURE_API_KEY = os.getenv("AZURE_OPENAI_KEY")
 AZURE_ENDPOINT = "https://fiancemngmnt.openai.azure.com/"  
 AZURE_API_VERSION = "2024-05-01-preview"
@@ -17,6 +17,7 @@ client = AzureOpenAI(
     api_version=AZURE_API_VERSION,
     azure_endpoint=AZURE_ENDPOINT
 )
+
 
 @app.route("/")
 def home():
@@ -32,57 +33,52 @@ def ask_ui():
     if not user_query:
         return render_template("index.html", answer="Please enter a question.")
 
-    csv_path=os.path.join(os.path.dirname(__file__),'transactions.csv')
+    
     try:
-        df = pd.read_csv(csv_path)
+        df = pd.read_csv("transactions.csv")
     except FileNotFoundError:
         return render_template("index.html", answer="Error: transactions.csv file not found")
 
-    
+   
     if "amount" in df.columns:
         df["amount"] = pd.to_numeric(df["amount"], errors="coerce").fillna(0)
 
-    context = "Transaction data available."
+    context = ""
     user_text = user_query.lower()
-    matched = False
 
+   
     if "date" in df.columns:
         df["date"] = pd.to_datetime(df["date"], errors="coerce")
-    
 
-    months = {
-        "january": 1, "february": 2, "march": 3, "april": 4,
-        "may": 5, "june": 6, "july": 7, "august": 8,
-        "september": 9, "october": 10, "november": 11, "december": 12
-    }
+        months = {
+            "january": 1, "february": 2, "march": 3, "april": 4,
+            "may": 5, "june": 6, "july": 7, "august": 8,
+            "september": 9, "october": 10, "november": 11, "december": 12
+        }
+        month_num = None
+        for m, num in months.items():
+            if m in user_text:
+                month_num = num
+                break
 
-    month_num = None
-    for m, num in months.items():
-        if m in user_text:
-            month_num = num
-            break
+        year_match = re.search(r"\b(20\d{2})\b", user_text)
+        year = int(year_match.group(1)) if year_match else None
 
-    year_match = re.search(r"\b(20\d{2})\b", user_text)
-    year = int(year_match.group(1)) if year_match else None
+        if month_num or year:
+            valid_dates = df.dropna(subset=["date"])
+            filtered = valid_dates.copy()
+            if month_num:
+                filtered = filtered[filtered["date"].dt.month == month_num]
+            if year:
+                filtered = filtered[filtered["date"].dt.year == year]
 
-    if month_num or year:
-        valid_dates = df.dropna(subset=["date"])
-        filtered = valid_dates.copy()
-
-        if month_num:
-            filtered = filtered[filtered["date"].dt.month == month_num]
-        if year:
-            filtered = filtered[filtered["date"].dt.year == year]
-
-        if filtered.empty:
-            context = f"No spending records found for {month_num if month_num else ''} {year if year else ''}."
-            df = filtered  
-        else:
-            df = filtered
-            if len(df) < len(valid_dates):
-                context += " (Note: Some records were skipped because the date was missing)"
+            if filtered.empty:
+                return render_template("index.html", answer=f"No spending records found for {month_num if month_num else ''} {year if year else ''}.")
+            else:
+                df = filtered
 
     
+    matched = False
     for cat in df["category"].dropna().unique():
         pat = rf"\b{re.escape(cat.lower())}\b"
         if re.search(pat, user_text):
@@ -92,8 +88,7 @@ def ask_ui():
             break
 
     if not matched:
-        total_spent = df["amount"].sum()
-        context = f"Your total spending was {total_spent} INR."
+        return render_template("index.html", answer=f"No records found for category mentioned in your query: '{user_query}'.")
 
     
     try:
@@ -114,8 +109,6 @@ def ask_ui():
 
 
 
-
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8000))
     app.run(host="0.0.0.0", port=port)
-
