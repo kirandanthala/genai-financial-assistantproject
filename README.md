@@ -1,281 +1,281 @@
-GENAI POWERED FINANCIAL ASSISTANT 
+--GENAI-POWERED FINANCIAL ASSISTANT--
 
-    **OBJECTIVE**  
-A GenAI-powered assistant that provides personalized financial insights based on user queries and transaction data.  
-. Accepts natural language queries (e.g., *“How much did I spend on groceries last month?”*)  
-. Analyzes structured transaction data ('transactions.csv)  
-. Uses  to generate financial summaries  
-. Provides actionable insights (spending trends, saving tips)  
-. Accessible via a simple *web interface* ('/ask-ui')  
+OVERVIEW:
+This project is a Flask-based web application powered by Azure OpenAI.
+It allows users to ask natural language questions about their financial transactions, and get AI-generated insights based on contextual transaction data.
 
 
-   *PROJECT STRUCTURE**
-genai-financial-assistantproject/
-│-- app.py # Flask application
-│-- requirements.txt # Dependencies
-│-- transactions.csv # Sample transaction dataset
-│-- templates/
-└── index.html # Web interface
-│-- README.md # Documentation
+FEATURES:
+       =>Query expenses by category (e.g., groceries, rent, travel, shopping).
+       =>Query expenses by category + month/year (e.g., travel in Sept 2025).
+       =>Handle missing dates and missing amounts gracefully.
+       =>Reject invalid or irrelevant queries with safe responses.
+       =>Accessible via a basic web interface hosted on Azure App Service.
 
+ARCHITECTURE:
 
+   flowchart TD
+    User[User Query via Browser] -->|POST /ask-ui| FlaskApp[Flask Application]
+    FlaskApp -->|Reads| CSV[transactions.csv]
+    FlaskApp -->|Context + Query| AzureOpenAI[Azure OpenAI Service]
+    AzureOpenAI --> Response[AI Response Returned]
+    Response --> User
 
---- SETUP INSTRUCTIONS
+SETUP INSTRUCTIONS:
 
-1.Clone the Repository  
-git clone https://github.com/kirandanthala/genai-financial-assistantproject
-cd genai-financial-assistantproject
+1.Clone the Repo
+     git clone https://github.com/kirandanthala/genai-financial-assistantproject
+     cd genai-financial-assistantproject
+    
+2.Create Virtual Environment
+      python -m venv venv
+      venv\Scripts\activate.bat --For windows
 
-2.Create Virtual Environment & Install Requirements
-python -m venv venv
-venv\Scripts\activate.bat  # Windows
-pip install -r requirements.txt
+3.Install Dependencies
+       pip install -r requirements.txt
 
-3.Run Locally
-python app.py
-Open in browser: http://127.0.0.1:5000
+4.Add the Data into Csv file.
+      -Create the file transactions.csv abd add below data
 
-*AZURE DEPLOYEMENT*
+5.Set Azure OpenAI keys
+       In Azure Portal → App Service → Configuration → Application settings,
+         AZURE_OPENAI_KEY = <Key1>
+6.Run Locally .
+      =>python app.py
+      Visit this link after running in local. 
+         http://127.0.0.1:8000
+7.Deploy to Azure
+    Push to GitHub
+    Connect repo in Azure App Service
+    Add startup command:
+              =>gunicorn app:app --bind=0.0.0.0:$PORT
+    Restart service
 
-Deployed using Azure App Service (Linux, Python runtime)
-Environment Variables (Configuration → Application Settings):
-AZURE_OPENAI_KEY → AZURE_API_KEY
-AZURE_ENDPOINT →  https://fiancemngmnt.openai.azure.com/
-AZURE_DEPLOYMENT → Financemodel-genai
+USER STORIES (3C Format)
+    Story 1 – Category-Based Query
+       Card: As a user, I want to query expenses by category so that I can track spending patterns.
+       Conversation: Discussed common categories like groceries, rent, travel.
+       Confirmation: Query returns total spend for the mentioned category.
 
-Public URL:
-https://genaiassistant-e7h3hkf7fagdawa2.canadacentral-01.azurewebsites.net/ask-ui
+    Story 2 – Category + Date Query
+       Card: As a user, I want to query expenses by category and month/year so that I can track spending over time.
+       Conversation: Mentioned travel in Sept 2025, groceries in July, etc.
+       Confirmation: Query returns filtered sum for that period.
 
-==>USAGE
-Web Interface: / or /ask-ui
-Accessible in any browser:
+    Story 3 – Handle Missing Dates
+       Card: As a user, I want the system to skip or notify missing dates so that my results remain accurate.
+       Conversation: If all rows missing → respond with “No records found”.
+       Confirmation: Properly ignores lanks, does not crash.
 
-https://genaiassistant-e7h3hkf7fagdawa2.canadacentral-01.azurewebsites.net/ask-ui
+    Story 4 – Handle Missing Amounts
+       Card: As a user, I want missing or invalid amounts treated as 0 so that my totals are correct.
+       Conversation: Blank or “abc” → treated as 0.
+       Confirmation: Still gives a valid total.
 
-Shows a text box to enter queries
-Displays AI response directly below
+    Story 5 – Handle Invalid Queries
+       Card: As a user, I want irrelevant queries to be handled gracefully so that system does not confuse or break.
+       Conversation: If query unrelated (e.g., president of India) → respond with “No records found”.
+       Confirmation: Rejects safely.
 
-**USER STORIES* 
-==>>User Story 1 – Category Spending (e.g., groceries, shopping, medicine)
-
+TESTCASES IN FORMAT:
+Story 1 – Category-Based Query
 TC1.1 – Query groceries spending
 Preconditions: transactions.csv has category = groceries.
 Steps:
 Open Web UI.
-1.Enter: “How much did I spend on groceries last month?”
-2.Submit.
+Enter: “How much did I spend on groceries last month?”
+Submit.
 Expected Result: System returns grocery total from CSV.
-Actual Result: (Filled in table)
+Actual Result:You spent 5700.0 INR on groceries.
 
-TC1.2 – Query shopping spending
-Preconditions: transactions.csv has category = shopping.
+TC1.2 – Query rent spending
+Preconditions: CSV has category = rent.
 Steps:
 Open Web UI.
-1.Enter: “How much on shopping last month?”
-2.Submit.
-Expected Result: System returns shopping total.
-Actual Result: (Filled in Table)
+Enter: “How much was my rent?”
+Ask
+Expected Result: System returns rent total.
+Actual Result:Your rent was 8000.0 INR.
 
-TC1.3 – Query haircut spending
-Preconditions: transactions.csv has category = haircut.
+TC1.3 – Query travel spending
+Preconditions: CSV has category = travel.
 Steps:
-Open Web UI.
-1.Enter: “What about Haircut expenses?”
-2.Submit.
-Expected Result: System returns medicine total.
-Actual Result: (Filled in Table)
+Enter: “Show my travel expenses.”
+Ask
+Expected Result: System returns travel total.
+Actual Result:You spent 9000.0 INR on travel.
 
-TC1.4 – (Negative) Unknown category
-Preconditions: transactions.csv does NOT have category = movies.
+TC1.4 – Negative: Unknown category
+Preconditions: CSV does not have category = medicine.
 Steps:
-Open Web UI.
-1.Enter: “How much did I spend on movies last month?”
-2.Submit.
-Expected Result: System returns total spending (fallback).
-Actual Result: (Filled in Table)
+Enter: “What was my medicine bill?”
+Submit.
+Expected Result: System responds: “No records found for medicine.”
+Actual Result: —
 
-===>>User Story 2 – Rent Spending
-
-TC2.1 – Query rent
-Preconditions: transactions.csv has category = rent.
+Story 2 – Category + Date Query
+TC2.1 – Query travel in September 2025
+Preconditions: CSV has travel rows in Aug 2025.
 Steps:
-Open Web UI.
-1.Enter: “What was my rent last month?”
-2.Submit.
-Expected Result: System returns rent amount.
-Actual Result: (Filled in Table)
+Enter: “How much did I spend on travel in August 2025?”
+Ask
+Expected Result: Returns filtered sum for travel in Sept 2025.
+Actual Result:It appears that you spent 5000.0 INR on travel. If you are inquiring about a future travel plan in August 2025, please provide more details or clarify your question.
 
-TC2.2 – Rent alternative wording
-Preconditions: Same CSV.
+TC2.2 – Query rent in August 2025
+Preconditions: CSV has rent rows in Aug 2025.
 Steps:
-1.Enter: “Tell me my house rent last month”.
-2.Submit.
-Expected Result: System returns rent amount.
-Actual Result: (Filled in Table)
+Enter: “How much rent in August 2025?”
+Submit.
+Expected Result: Returns rent in Aug 2025.
+Actual Result: The rent paid in August 2025 was 8000.0 INR.
 
-TC2.3 – Rent case-insensitive
-Preconditions: Same CSV.
+TC2.3 – Query groceries in July 2025
+Preconditions: CSV has groceries in July 2025.
 Steps:
-1.Enter: “rent” (lowercase).
-2.Submit.
-Expected Result: System returns rent amount.
-Actual Result: (Filled in Table)
+Enter: “Groceries in July 2025?”
+Submit.
+Expected Result: Returns groceries spend in July.
+Actual Result:The total amount spent on groceries in September 2025 was 2200.0 INR.
 
-TC2.4 – (Negative) Rent missing
-Preconditions: transactions.csv does NOT have category = rent.
+TC2.4 – Negative: No records for month
+Preconditions: CSV has no travel in June 2025.
 Steps:
-1.Enter: “What was my rent last month?”
-2.Submit.
-Expected Result: System falls back → total spending.
-Actual Result: (Filled in Table)
+Enter: “How much travel in June 2025?”
+Submit.
+Expected Result: Responds: “No spending records found for June 2025.”
+Actual Result: There are no spending records found for the category 'travel' in June.
 
-==>>User Story 3 – Analyst Spending Trends
-
-TC3.1 – Query travel
-Preconditions: transactions.csv has category = travel.
+Story 3 – Handle Missing Dates
+TC3.1 – Query travel with valid dates
+Preconditions: CSV travel rows have proper dates.
 Steps:
-1.Enter: “How much did I spend on travel last month?”
-2.Submit.
-Expected Result: System returns travel amount.
-Actual Result: (Filled in Table)
+Enter: “How much on travel in Sept 2025?”
+Submit.
+Expected Result: Correct filtered result.
+Actual Result:You spent 5000.0 INR on travel in August 2025.
 
-TC3.2 – Query groceries (trend)
-Preconditions: Same CSV.
+TC3.2 – Query rent with mixed dates
+Preconditions: Some rent rows have valid Aug 2025, some missing dates.
 Steps:
-1.Enter: “Groceries expense last month?”
-2.Submit.
-Expected Result: System returns groceries total.
-Actual Result: (Filled in Table)
+Enter: “How much rent in Aug 2025?”
+Submit.
+Expected Result: Only valid dated rows included; missing skipped.
+Actual Result: —
 
-TC3.3 – Query shopping (trend)
-Preconditions: Same CSV.
+TC3.3 – Query groceries with partial dates
+Preconditions: Groceries in Aug & Sept, but some missing dates.
 Steps:
-1.Enter: “Shopping spending last month?”
-2.Submit.
-Expected Result: System returns shopping total.
+Enter: “Groceries in Sept 2025?”
+Submit.
+Expected Result: Sept groceries only; blanks ignored.
+Actual Result: —
 
-Actual Result: (Filled in Table)
-
-TC3.4 – (Negative) Empty CSV
-Preconditions: transactions.csv is empty.
+TC3.4 – Negative: All missing dates
+Preconditions: All groceries rows have blank dates.
 Steps:
-1.Enter: “How much did I spend on travel last month?”
-2.Submit.
-Expected Result: System returns error “transactions.csv file not found or empty”.
-Actual Result: (Filled in Table)
+Enter: “Groceries in Sept 2025?”
+Submit.
+Expected Result: Responds: “No records found.”
+Actual Result: —
 
-==>>User Story 4 – Edge Cases / Developer Testing
+Story 4 – Handle Missing Amounts
+TC4.1 – Shopping with valid amounts
+Preconditions: Shopping rows have valid numbers.
+Steps
+Enter: “Shopping spend?”
+Submit.
+Expected Result: Returns total shopping spend.
+Actual Result: —
 
-TC4.1 – Empty query
-Preconditions: Web UI loaded.
+TC4.2 – Shopping with blanks
+Preconditions: One shopping row = 2000, one blank.
 Steps:
-1.Leave query field blank.
-2.Submit.
-Expected Result: System shows “Please enter a question.”
-Actual Result: (Filled in Table)
+Enter: “Shopping spend?”
+Submit.
+Expected Result: Blank treated as 0, result = 2000.
+Actual Result: —
 
-TC4.2 – Invalid query
-Preconditions: Same CSV.
+TC4.3 – Travel with invalid amount
+Preconditions: Travel row = 1500, another = "abc".
 Steps:
-1.Enter: “asdfghjkl???”
-2.Submit.
-Expected Result: System falls back → total spending.
-Actual Result: (to be filled)
+Enter: “Travel spend?”
+Submit.
+Expected Result: Invalid coerced to 0, total = 1500.
+Actual Result: —
 
-TC4.3 – Query with symbols
-Preconditions: CSV has travel.
+TC4.4 – Negative: All missing amounts
+Preconditions: All shopping rows have blank amounts.
 Steps:
-1.Enter: “!!! Travel ???”
-2.Submit.
-Expected Result: System still detects travel and returns amount.
-Actual Result: (to be filled)
+Enter: “Shopping spend?”
+Submit.
+Expected Result: Responds with “0 INR spent on shopping.”
+Actual Result: —
 
-TC4.4 – (Negative) Special characters only
-Preconditions: Web UI loaded.
+Story 5 – Handle Invalid Queries
+TC5.1 – Empty query
+Preconditions: Form input is empty.
 Steps:
-1.Enter: “@@@###”.
-2.Submit.
-Expected Result: System falls back → total spending.
-Actual Result: (to be filled)
+Leave query blank.
+Submit.
+Expected Result: System responds: “Please enter a question.”
+Actual Result: —
 
-==>>User Story 5 – Total Spending
-
-TC5.1 – Query total
-Preconditions: transactions.csv has multiple categories.
+TC5.2 – Irrelevant query
+Preconditions: Query outside finance.
 Steps:
-1.Enter: “What is my total spending last month?”
-2.Submit.
-Expected Result: System returns total spending.
-Actual Result: (Filled in Table)
+Enter: “Who is the PM of India?”
+Submit.
+Expected Result: “No records found.”
+Actual Result: —
 
-TC5.2 – Alternative wording
-Preconditions: Same CSV.
+TC5.3 – Gibberish query
+Preconditions: Input meaningless text.
 Steps:
-1.Enter: “Show all my expenses last month”
-2.Submit.
-Expected Result: System returns total spending.
-Actual Result: (Filled in Table)
+Enter: “asdasd qwe123”
+Submit.
+Expected Result: “No records found.”
 
-TC5.3 – Lowercase query
-Preconditions: Same CSV.
+Actual Result: —
+
+TC5.4 – Negative: Unsupported intent
+
+Preconditions: Query asks prediction.
+
 Steps:
-1.Enter: “total spending”
-2.Submit.
-Expected Result: System returns total spending.
-Actual Result: (Filled in Table)
 
-TC5.4 – (Negative) Malformed query
-Preconditions: Same CSV.
-Steps:
-1.Enter: “Tell me blah blah”
-2.Submit.
-Expected Result: System falls back → total spending.
-Actual Result: (Filled in Table)
+Enter: “Predict my shopping next month.”
 
+Submit.
 
-TESTCASES 
-Test ID	User Story	Description	Preconditions	Test Steps	Expected Result	Actual Result
-TC1.1	Story 1 – Category Query groceries spending	transactions.csv has groceries	Enter “How much did I spend on groceries last month?” in Web UI	Returns grocery total	(You spent 1700 INR on groceries last month.)
-TC1.2	Story 1 – Category	Query shopping spending	CSV has shopping	Enter “How much on shopping last month?”	Returns shopping total	(You spent 2000 INR on shopping last month)
-TC1.3	Story 1 – Category	Query haircut spending	CSV has haircut	Enter “What about haircut expenses?”	Returns medicine total	(The haircut expenses of 300 INR can be recorded as a personal expense under the category of personal care or grooming in your financial records for last month.)
-TC1.4	Story 1 – Category (Negative)	Query unknown category	CSV does NOT have movies	Enter “How much did I spend on movies last month?”	Returns total spending (fallback)	(You spent 11600 INR last month, but without further details, I cannot provide the specific amount you spent on movies. If you have a breakdown of your expenses or can provide more information, I can help you determine the exact amount spent on movies.)
-TC2.1	Story 2 – Rent	Query rent	CSV has rent	Enter “What was my rent last month?”	Returns rent amount	(Your rent last month was 5000 INR.)
-TC2.2	Story 2 – Rent	Rent alternative wording	CSV has rent	Enter “Tell me my house rent last month”	Returns rent amount	(Your house rent last month was 5000 INR.)
-TC2.3	Story 2 – Rent	Rent case-insensitive	CSV has rent	Enter “RENT”	Returns rent amount	(Thank you for providing the context. I have recorded the rent expense of 5000 INR for last month. If you need any further assistance or have any other transactions to report, please let me know.)
-TC2.4	Story 2 – Rent (Negative)	Rent missing in CSV	CSV has no rent	Enter “What was my rent last month?”	Returns total spending (fallback)	(Your medicine bill amount was not explicitly provided in the context given. However, if your total spending last month was 11600 INR and you want to know the medicine bill amount, you would need to provide more specific information related to your expenses for me to accurately determine the exact amount spent on medicines.)
-TC3.1	Story 3 – Analyst Trends	Query travel	CSV has travel	Enter “How much did I spend on travel last month?”	Returns travel total	(You spent 600 INR on travel last month.)
-TC3.2	Story 3 – Analyst Trends	Query groceries	CSV has groceries	Enter “Groceries expense last month?”	Returns groceries total	(You spent 1700 INR on groceries last month.)
-TC3.3	Story 3 – Analyst Trends	Query shopping	CSV has shopping	Enter “Shopping spending last month?”	Returns shopping total	(You spent 2000 INR on shopping last month.)
-TC3.4	Story 3 – Analyst Trends (Negative)	Empty CSV	transactions.csv is empty	Enter “How much did I spend on travel last month?”	Returns error (file not found / empty)	(fill)
-TC4.1	Story 4 – Edge Case	Empty query	Web UI loaded	Leave field blank → Submit	Returns “Please enter a question.”	(We can see when not entering anything means in UI)
-TC4.2	Story 4 – Edge Case	Invalid query	CSV present	Enter “asdfghjkl???”	Returns total spending (fallback)	(It seems like you might be inquiring about your spending from last month. Your total spending was 11600 INR. Let me know if you need any further assistance or clarification regarding your finances.)
-TC4.3	Story 4 – Edge Case	Query with symbols	CSV has travel	Enter “!!! Travel ???”	Returns travel total	(Thank you for providing that information. It appears that you spent 600 INR on travel last month. If you need any assistance with managing your travel expenses or budgeting for future trips, feel free to let me know.)
-TC4.4	Story 4 – Edge Case (Negative)	Symbols only	Web UI loaded	Enter “@@@###”	Returns total spending (fallback)	(fill)
-TC5.1	Story 5 – Total	Query total spending	CSV has multiple categories	Enter “What is my total spending last month?”	Returns total spending	(Your total spending last month was 11600 INR.)
-TC5.2	Story 5 – Total	Alternative wording	Same CSV	Enter “Show all my expenses last month”	Returns total spending	(Certainly! Here are your expenses breakdown for last month: 1. Rent: 6000 INR 2. Groceries: 2000 INR 3. Utilities: 1200 INR 4. Dining out: 1400 INR 5. Transportation: 1000 INR Total Expenses: 11600 INR Please let me know if you need further details or assistance.)
-TC5.3	Story 5 – Total	Lowercase query	Same CSV	Enter “total spending”	Returns total spending	(Your total spending last month was 11600 INR.)
-TC5.4	Story 5 – Total (Negative)	Malformed query	Same CSV	Enter “Tell me blah blah”	Returns total spending (fallback)	(Based on the context provided, your total spending last month was 11600 INR. If you need further details or specific information, feel free to ask.)
+Expected Result: “No records found.”
+Actual Result: —
+
+TESTCASES:
+ Test ID	User Story	Description	Preconditions	Test Steps	Expected Result	Actual Result
+TC1.1	Story 1	Groceries total spend	CSV has groceries	Ask: “How much did I spend on groceries?”	Returns grocery total	"You spent 5700.0 INR on groceries."
+TC1.2	Story 1	Rent spend	CSV has rent	Ask: “Rent expense?”	Returns rent total	Your rent was 8000.0 INR.
+TC1.3	Story 1	Travel spend	CSV has travel	Ask: “Travel spend?”	Returns travel total	You spent 9000.0 INR on travel.
+TC1.4 	Story 1	Negative – Unknown category	No “medicine” category	Ask: “Medicine spend?”	Responds: No records found	I'm sorry, but I couldn't find any records for medicine spend in the available data. If you have any other financial transactions or categories you would like to inquire about, please let me know.
+TC2.1	Story 2	Travel in Sept 2025	CSV has travel in Sept	Ask: “Travel in August 2025?”	Returns Aug travel	It appears that you spent 5000.0 INR on travel. If you are inquiring about a future travel plan in August 2025, please provide more details or clarify your question.
+TC2.2	Story 2	Rent in Aug 2025	CSV has rent in Aug	Ask: “Rent in Aug 2025?”	Returns Aug rent  The rent paid in August 2025 was 8000.0 INR.
+TC2.3	Story 2	Groceries in July 2025	CSV has groceries in July	Ask: “Groceries in September 2025?”	Returns July groceries	The total amount spent on groceries in September 2025 was 2200.0 INR.
+TC2.4 	Story 2	Negative – No records	No travel in June 2025	Ask: “Travel in June 2025?”	Responds: No records found	There are no spending records found for the category 'travel' in June.
+TC3.1	Story 3	Travel with dates	CSV has travel dates	Ask: “Travel in Sept 2025?”	Returns August travel  	
+TC3.1	Story 3	Travel with dates	CSV has travel dates	Ask: “Travel in Sept 2025?”	Returns Sep travel You spent 5000.0 INR on travel in August 2025.	
+TC3.2	Story 3	Rent with mixed dates	Rent rows with Aug + blanks	Ask: “Rent in Aug 2025?”	Returns Aug rent only	You spent 5000.0 INR on travel in August 2025.
+TC3.3	Story 3	Groceries multiple months	Groceries in Aug + Sept	Ask: “Groceries in Sept 2025?”	Returns Sept groceries	You spent 2200.0 INR on groceries in September 2025.
+TC3.4 	Story 3	Negative – all missing dates	Rows blank dates	Ask: “Movies in June 2025?”	Responds: No records found	There are no spending records found for movies in June 2025.
+TC4.1	Story 4	Shopping valid amounts	Shopping rows with numbers	Ask: “Shopping spend?”	Returns shopping total	You spent 3000.0 INR on shopping.
+TC4.2	Story 4	Shopping mixed amounts	One row 2000, one blank	Ask: “Shopping spend?”	Returns 2000	You spent 2000.0 INR on shopping.
+TC4.3	Story 4	Travel with invalid values	Travel rows 1500 + "abc"	Ask: “Travel spend?”	Returns 1500	
+TC4.4 	Story 4	Negative – all missing amounts	Shopping rows blank only	Ask: “Shopping spend?”	Responds: 0 INR spent	
+TC5.1	Story 5	Empty query	Form empty	Submit blank	Please enter a question	"Please fill out this field"
+TC5.2	Story 5	Irrelevant query	Query outside dataset	Ask: “Who is PM of India?”	No records found
+TC5.3	Story 5	Gibberish	Random chars	Ask: “asdasd qwe123”	No records found I'm sorry, but I couldn't find any records for the category mentioned in your query. If you have any other questions or need assistance with a different category, please let me know.
+TC5.4 	Story 5	Negative – unsupported intent	Predictive query	Ask: “Predict shopping next month”	No records found/cannot predict	 I'm sorry, I cannot predict your shopping expenses for next month based on the information provided.
 
 
+    
+ 
 
-              **Architecture*
-flowchart 
-    A[User Query in Web UI] --> B[Flask App]
-    B --> C[Load transactions.csv using pandas]
-    C --> D[Dynamic Category Detection]
-    D --> E[Azure OpenAI Deployment]
-    E --> F[AI Response Generated]
-    F --> G[Answer Displayed in Browser]
-
-===> LEARNINGS AND CHALLENGES
-
--Learned how to integrate Flask with Azure OpenAI.
--Understood environment variable handling to protect secrets.
--Faced issues with deployment (Application Error, 405 Method Not Allowed) and fixed them.
--Implemented dynamic category detection → now app works with any category in transactions.csv.
--Learned Agile practices → writing User Stories (3C) and Test Cases (with actual results).
-
-
-Web Interface:
-
-https://genaiassistant-e7h3hkf7fagdawa2.canadacentral-01.azurewebsites.net/ask-ui
