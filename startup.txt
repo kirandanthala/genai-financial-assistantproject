@@ -1,1 +1,3 @@
-gunicorn --bind=0.0.0.0:$PORT app:app
+#!/bin/bash
+echo "Starting Gunicorn..."
+gunicorn app:app --bind=0.0.0.0:$PORT
