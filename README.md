@@ -65,23 +65,23 @@ SETUP INSTRUCTIONS:
     Restart service
 
 USER STORIES (3C Format)
-    Story 1 – Category-Based Query
+Story 1 – Category-Based Query
        Card: As a user, I want to query expenses by category so that I can track spending patterns.
        Conversation: Discussed common categories like groceries, rent, travel.
        Confirmation: Query returns total spend for the mentioned category.
-    Story 2 – Category + Date Query
+Story 2 – Category + Date Query
        Card: As a user, I want to query expenses by category and month/year so that I can track spending over time.
        Conversation: Mentioned travel in Sept 2025, groceries in July, etc.
        Confirmation: Query returns filtered sum for that period.
-    Story 3 – Handle Missing Dates
+Story 3 – Handle Missing Dates
        Card: As a user, I want the system to skip or notify missing dates so that my results remain accurate.
        Conversation: If all rows missing → respond with “No records found”.
        Confirmation: Properly ignores lanks, does not crash.
-    Story 4 – Handle Missing Amounts
+Story 4 – Handle Missing Amounts
        Card: As a user, I want missing or invalid amounts treated as 0 so that my totals are correct.
        Conversation: Blank or “abc” → treated as 0.
        Confirmation: Still gives a valid total.
-    Story 5 – Handle Invalid Queries
+Story 5 – Handle Invalid Queries
        Card: As a user, I want irrelevant queries to be handled gracefully so that system does not confuse or break.
        Conversation: If query unrelated (e.g., president of India) → respond with “No records found”.
        Confirmation: Rejects safely.
@@ -280,36 +280,36 @@ TC5.3	Story 5	Gibberish	Random chars	Ask: “asdasd qwe123”	No records found I
 TC5.4 	Story 5	Negative – unsupported intent	Predictive query	Ask: “Predict shopping next month”	No records found/cannot predict	 I'm sorry, I cannot predict your shopping expenses for next month based on the information provided.
 
 LEARNINGS AND CHALLENGES:
-    1.Flask + Azure Integration
+1.Flask + Azure Integration
        Learned how to build a lightweight Flask API/UI and deploy it on Azure App Service with Gunicorn.
        Understood how to use environment variables (os.getenv) for securely managing API keys.
-    2.Data Handling with Pandas
+2.Data Handling with Pandas
         Gained experience in cleaning data (to_numeric, to_datetime) to handle missing/invalid values.
         Implemented category and date-based filtering dynamically.
-    3.Prompt Engineering for Azure OpenAI
+3.Prompt Engineering for Azure OpenAI
         Designed system and user messages to restrict the model to use only provided transaction context.
         Ensured deterministic responses by setting temperature=0.
-    4.Error Handling & Debugging
+4.Error Handling & Debugging
         Dealt with common issues like transactions.csv not found, missing columns, and invalid startup commands.
         Used Kudu Console and Azure log streaming for debugging deployment issues.
-    5.Agile Practices
+5.Agile Practices
         Wrote user stories in 3C format (Card, Conversation, Confirmation).
         Designed positive & negative test cases for each story, ensuring robustness.
 
 CHALLENGES:
-     1.Deployment Issues
+1.Deployment Issues
        Faced repeated “Container failed to start on port 8000” errors.
        Fixed using proper Gunicorn startup command and startup.txt.
-     2.Missing Transactions Data
+2.Missing Transactions Data
        CSV initially not being deployed to Azure.
        Solved by force-including transactions.csv and verifying in Kudu /site/wwwroot/.
-     3.Dynamic Categories
+3.Dynamic Categories
       Initially hardcoded categories (groceries, rent, travel).
        Moved to a dynamic matching system that reads categories from CSV directly.
-     4.Negative Test Handling
+4.Negative Test Handling
        Without fallback, system had to explicitly say “No records found” when category/date not available.
        Required refining logic to check filtered.empty.
-     5.Environment Variables & Secrets
+5.Environment Variables & Secrets
         GitHub push was blocked due to exposed API key.
         Resolved by removing secrets from code and using Azure’s Application Settings.
 
