@@ -69,22 +69,18 @@ USER STORIES (3C Format)
        Card: As a user, I want to query expenses by category so that I can track spending patterns.
        Conversation: Discussed common categories like groceries, rent, travel.
        Confirmation: Query returns total spend for the mentioned category.
-
     Story 2 – Category + Date Query
        Card: As a user, I want to query expenses by category and month/year so that I can track spending over time.
        Conversation: Mentioned travel in Sept 2025, groceries in July, etc.
        Confirmation: Query returns filtered sum for that period.
-
     Story 3 – Handle Missing Dates
        Card: As a user, I want the system to skip or notify missing dates so that my results remain accurate.
        Conversation: If all rows missing → respond with “No records found”.
        Confirmation: Properly ignores lanks, does not crash.
-
     Story 4 – Handle Missing Amounts
        Card: As a user, I want missing or invalid amounts treated as 0 so that my totals are correct.
        Conversation: Blank or “abc” → treated as 0.
        Confirmation: Still gives a valid total.
-
     Story 5 – Handle Invalid Queries
        Card: As a user, I want irrelevant queries to be handled gracefully so that system does not confuse or break.
        Conversation: If query unrelated (e.g., president of India) → respond with “No records found”.
@@ -287,15 +283,12 @@ LEARNINGS AND CHALLENGES:
     1.Flask + Azure Integration
        Learned how to build a lightweight Flask API/UI and deploy it on Azure App Service with Gunicorn.
        Understood how to use environment variables (os.getenv) for securely managing API keys.
-
     2.Data Handling with Pandas
         Gained experience in cleaning data (to_numeric, to_datetime) to handle missing/invalid values.
         Implemented category and date-based filtering dynamically.
-
     3.Prompt Engineering for Azure OpenAI
         Designed system and user messages to restrict the model to use only provided transaction context.
         Ensured deterministic responses by setting temperature=0.
-
     4.Error Handling & Debugging
         Dealt with common issues like transactions.csv not found, missing columns, and invalid startup commands.
         Used Kudu Console and Azure log streaming for debugging deployment issues.
